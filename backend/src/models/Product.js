@@ -1,8 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-  name: String,
-  data: Object,
+  name: { type: String, required: true },
+  carbsPer100g: { type: Number, required: true },
+  portionSize: Number,
+  category: String,
 });
 
-module.exports = mongoose.model("Product", productSchema);
+const Product = mongoose.model("Product", productSchema);
+
+export default Product;

@@ -1,24 +1,64 @@
-const axios = require("axios");
-const Product = require("../models/Product");
+import Product from "../models/Product.js";
 
-async function getProductByName(name) {
-  const cached = await Product.findOne({ name: name.toLowerCase() });
-  if (cached) {
-    return cached.data;
+// Create a new product
+const createProduct = async (name, carbs) => {
+  try {
+    const newProduct = new Product({ name, carbs });
+    await newProduct.save();
+    return newProduct;
+  } catch (err) {
+    throw new Error("Error creating product: " + err.message);
   }
+};
 
-  const url = `https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(
-    name
-  )}.json`;
-  const res = await axios.get(url);
-  const data = res.data;
-
-  if (data.status === 1) {
-    await Product.create({ name: name.toLowerCase(), data: data.product });
-    return data.product;
-  } else {
-    throw new Error("Product not found in external API");
+// Get all products
+const getProducts = async () => {
+  try {
+    return await Product.find();
+  } catch (err) {
+    throw new Error("Error fetching products: " + err.message);
   }
-}
+};
 
-module.exports = { getProductByName };
+// Get a single product by ID
+const getProductById = async (id) => {
+  try {
+    const product = await Product.findById(id);
+    if (!product) throw new Error("Product not found");
+    return product;
+  } catch (err) {
+    throw new Error("Error fetching product: " + err.message);
+  }
+};
+
+// Update a product
+const updateProduct = async (id, updateData) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+    if (!updatedProduct) throw new Error("Product not found");
+    return updatedProduct;
+  } catch (err) {
+    throw new Error("Error updating product: " + err.message);
+  }
+};
+
+// Delete a product
+const deleteProduct = async (id) => {
+  try {
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) throw new Error("Product not found");
+    return { message: "Product deleted" };
+  } catch (err) {
+    throw new Error("Error deleting product: " + err.message);
+  }
+};
+
+export {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+};
