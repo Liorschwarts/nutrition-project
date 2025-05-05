@@ -1,36 +1,52 @@
 "use client";
-
 import { useState } from "react";
+import { Card } from "../components/ui/FormElements";
+import InsulinCalculator from "../components/calculator/InsulinCalculator";
+import FoodSelector from "../components/food/FoodSelector";
+import SelectedFoodDisplay from "../components/food/SelectedFoodDisplay";
+import PageHeader from "../components/ui/PageHeader";
+import InfoDisclaimer from "../components/ui/InfoDisclaimer";
 
 export default function Home() {
-  const [product, setProduct] = useState("");
-  const [carbs, setCarbs] = useState(0);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [carbGrams, setCarbGrams] = useState("");
 
-  const handleInputChange = (e) => {
-    setProduct(e.target.value);
+  // Update carb grams when a food is selected
+  const handleFoodSelect = (food) => {
+    setSelectedFood(food);
+    setCarbGrams(food.carbsPerServing.toString());
   };
 
-  const handleCarbCalculation = () => {
-    setCarbs(Number(product) * 20); // דוגמה לחישוב פחמימות
+  // Update carb grams manually
+  const handleCarbInputChange = (value) => {
+    setCarbGrams(value);
+    setSelectedFood(null); // Clear selected food when manually entering carbs
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl">חישוב פחמימות</h2>
-      <input
-        type="number"
-        value={product}
-        onChange={handleInputChange}
-        className="border p-2 my-2"
-        placeholder="הכנס כמות המוצר"
+    <div className="space-y-6">
+      <PageHeader
+        title="Diabetes Carb Calculator"
+        description="Easily calculate insulin doses based on the carbohydrate content of your food."
       />
-      <button
-        onClick={handleCarbCalculation}
-        className="bg-blue-500 text-white p-2"
-      >
-        חישוב פחמימות
-      </button>
-      <p className="mt-4">סך הפחמימות: {carbs} גרם</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Card title="Select Food or Enter Carbs">
+          <FoodSelector
+            onFoodSelect={handleFoodSelect}
+            onCarbInputChange={handleCarbInputChange}
+            carbGrams={carbGrams}
+          />
+        </Card>
+
+        <Card title="Calculate Insulin Dose">
+          <InsulinCalculator carbGrams={carbGrams} />
+        </Card>
+      </div>
+
+      <InfoDisclaimer />
+
+      {selectedFood && <SelectedFoodDisplay food={selectedFood} />}
     </div>
   );
 }
