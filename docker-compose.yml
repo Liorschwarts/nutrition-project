@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+  # MongoDB service
+  mongo:
+    image: mongo:latest
+    container_name: diabetes-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    networks:
+      - diabetes-network
+
+  # Main API service
+  api-service:
+    build: ./backend
+    container_name: diabetes-api
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGO_URI=mongodb://root:rootpassword@mongo:27017/diabetes-app?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_change_in_production
+    networks:
+      - diabetes-network
+
+  # Image recognition service
+  image-service:
+    build: ./image-service
+    container_name: diabetes-image
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - API_SERVICE_URL=http://api-service:3001
+      - CLARIFAI_API_KEY=your_clarifai_api_key
+    networks:
+      - diabetes-network
+
+  # Frontend service (Next.js)
+  frontend:
+    build: ./frontend
+    container_name: diabetes-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_IMAGE_SERVICE_URL=http://localhost:3002
+    networks:
+      - diabetes-network
+
+networks:
+  diabetes-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

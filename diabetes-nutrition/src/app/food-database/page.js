@@ -6,12 +6,6 @@ import FoodDatabaseFilters from "../../components/database/FoodDatabaseFilters";
 import FoodDatabaseTable from "../../components/database/FoodDatabaseTable";
 import GlycemicIndexInfo from "../../components/database/GlycemicIndexInfo";
 
-const metadata = {
-  title: "Food Database | Diabetes Carb Calculator",
-  description:
-    "Browse our food database with carbohydrate content for various foods",
-};
-
 export default function FoodDatabase() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
