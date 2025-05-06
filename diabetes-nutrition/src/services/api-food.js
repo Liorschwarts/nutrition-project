@@ -131,4 +131,24 @@ export const foodApi = {
     const response = await fetch(`${API_URL}/api/foods/category/${category}`);
     return handleResponse(response);
   },
+
+  /**
+   * Get user's custom foods
+   * @returns {Promise<Array>} - List of user's custom foods
+   */
+  getUserFoods: async () => {
+    const token = getToken();
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await fetch(`${API_URL}/api/users/foods`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return handleResponse(response);
+  },
 };
